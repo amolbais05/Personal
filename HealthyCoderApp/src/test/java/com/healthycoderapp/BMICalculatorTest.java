@@ -9,12 +9,16 @@ import org.junit.jupiter.params.provider.CsvFileSource;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 class BMICalculatorTest {
+
+    private String environment = "prod";
 
     @BeforeAll
     static void beforeAll(){
@@ -155,10 +159,17 @@ class BMICalculatorTest {
     void should_ReturnCoderWithWorstBMIIn1Ms_When_CoderListHas10000Elements(){
 
         // given
-        
+        assumeTrue(this.environment.equals("prod"));
+        List<Coder> coders = new ArrayList<>();
+        for (int i = 0; i < 10000; i++) {
+            coders.add(new Coder(1.0+i, 10.0+i));
+        }
+
         // when
+        Executable executable = () -> BMICalculator.findCoderWithWorstBMI(coders);
 
         // then
+        assertTimeout(Duration.ofMillis(50), executable);
 
     }
 }
